@@ -3,6 +3,29 @@
 import { getState, saveState, uploadPhoto, isConfigured } from "@/lib/storage";
 import { revalidatePath } from "next/cache";
 
+export async function setVoteAction(member, picks) {
+  if (!isConfigured()) {
+    throw new Error("Storage not configured. Add a Vercel Blob store to this project.");
+  }
+  const state = await getState();
+  if (!state._votes) state._votes = {};
+  state._votes[member] = picks;
+  await saveState(state);
+  revalidatePath("/");
+  return state;
+}
+
+export async function clearAllVotesAction() {
+  if (!isConfigured()) {
+    throw new Error("Storage not configured. Add a Vercel Blob store to this project.");
+  }
+  const state = await getState();
+  state._votes = {};
+  await saveState(state);
+  revalidatePath("/");
+  return state;
+}
+
 export async function setEntryAction(id, updates) {
   if (!isConfigured()) {
     throw new Error("Storage not configured. Add a Vercel Blob store to this project.");
